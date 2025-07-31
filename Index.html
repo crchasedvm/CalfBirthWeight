@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factors Influencing Calf Birth Weight in New Zealand Dairy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .kpi-value {
+            font-weight: 900;
+            color: #00A6ED;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .flowchart-node {
+            border: 2px solid #753BBD;
+            background-color: #f3e8ff;
+            color: #372a4f;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flowchart-arrow {
+            position: relative;
+            width: 100%;
+            height: 2px;
+            background-color: #753BBD;
+            margin: 1.5rem 0;
+        }
+        .flowchart-arrow::after {
+            content: '▼';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #753BBD;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-[#753BBD] mb-4">The Birth Weight Balancing Act</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An analysis of the key factors influencing calf birth weight in New Zealand's pasture-based dairy systems.</p>
+        </header>
+
+        <section class="card text-center">
+            <h2 class="text-2xl font-bold mb-2">The Sire's Genetic Power</h2>
+            <p class="text-gray-600 mb-4">On a single farm, the choice of an individual beef sire alone can alter the average calf birth weight by up to:</p>
+            <div class="kpi-value text-7xl md:text-8xl">8.1 kg</div>
+            <p class="text-sm text-gray-500 mt-2">This highlights that individual genetic merit is more critical than breed alone.</p>
+        </section>
+
+        <section id="paradox" class="card">
+            <h2 class="text-3xl font-bold text-center mb-2">The Birth Weight Paradox</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Optimising birth weight means navigating the narrow path between two significant risks: calves being too light for viability or too heavy for a safe birth.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4 text-[#FF6B6B]">Risk: Too Light</h3>
+                    <div class="chart-container h-64 max-h-[30vh]">
+                        <canvas id="tooLightChart"></canvas>
+                    </div>
+                    <p class="text-center text-gray-600 mt-4">Calves with low birth weights face reduced vigour, higher susceptibility to disease, and are often unsuitable for the high-value dairy-beef market.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4 text-[#FF6B6B]">Risk: Too Heavy</h3>
+                    <div class="chart-container h-64 max-h-[30vh]">
+                        <canvas id="tooHeavyChart"></canvas>
+                    </div>
+                    <p class="text-center text-gray-600 mt-4">For every 1kg increase in birth weight, the risk of calving difficulty (dystocia) increases by 2.3%, leading to higher calf and dam mortality.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="genetics" class="card">
+            <h2 class="text-3xl font-bold text-center mb-8">The Genetic Blueprint</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Dam & Sire Breed Influence</h3>
+                    <p class="text-center text-gray-600 mb-4">The combination of dam and sire breeds sets the genetic potential for calf size. Holstein-Friesian genetics consistently produce the heaviest calves.</p>
+                    <div class="chart-container">
+                        <canvas id="breedComparisonChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">The Dairy-Beef Challenge on Heifers</h3>
+                    <p class="text-center text-gray-600 mb-4">Using beef sires on first-calving heifers increases calf value but significantly elevates birth weight and the need for calving assistance.</p>
+                    <div class="chart-container">
+                        <canvas id="dairyBeefHeiferChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="maternal" class="card">
+            <h2 class="text-3xl font-bold text-center mb-8">Maternal & Management Factors</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">The Parity Effect: Heifers vs. Mature Cows</h3>
+                    <p class="text-center text-gray-600 mb-4">First-calving heifers produce significantly lighter calves than mature cows due to their own ongoing growth and smaller physical size.</p>
+                    <div class="chart-container" style="height: 300px; max-height: 35vh;">
+                        <canvas id="parityEffectChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Nutrition is Key: Body Condition Score (BCS)</h3>
+                    <p class="text-center text-gray-600 mb-4">Achieving target BCS at calving is the most critical management factor for ensuring a healthy dam and optimal calf birth weight.</p>
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <p class="font-bold text-[#00A6ED]">Target for Mature Cows: BCS 5.0</p>
+                            <p class="text-sm text-gray-700">Ensures adequate energy for calving and lactation.</p>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-200 p-4 rounded-lg">
+                            <p class="font-bold text-[#753BBD]">Target for Heifers: BCS 5.5</p>
+                            <p class="text-sm text-gray-700">Supports their own growth alongside the calf's.</p>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <p class="font-bold text-[#FF6B6B]">Risk of Low BCS</p>
+                            <p class="text-sm text-gray-700">Leads to lighter calves, reduced milk yield, and poor fertility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="seasonal" class="card">
+            <h2 class="text-3xl font-bold text-center mb-2">Seasonal Dynamics</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">The choice between spring and autumn calving creates a trade-off between birth weight and subsequent growth, driven by pasture availability.</p>
+            <div class="chart-container md:col-span-2">
+                <canvas id="seasonalDynamicsChart"></canvas>
+            </div>
+            <p class="text-center text-gray-600 mt-4">Autumn-born calves are often heavier at birth due to better late-gestation nutrition for the dam, but may have slower pre-weaning growth as the dam's milk production is supported by lower-quality winter pasture.</p>
+        </section>
+
+        <section id="strategy" class="card">
+            <h2 class="text-3xl font-bold text-center mb-8">An Integrated Breeding Strategy</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Optimising outcomes requires a tiered strategy that matches sires to dams based on risk and production goals.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="flex flex-col items-center">
+                    <div class="flowchart-node w-full">Tier 1: First-Calving Heifers</div>
+                    <div class="flowchart-arrow"></div>
+                    <div class="p-4 bg-gray-50 rounded-lg text-center">
+                        <p class="font-bold text-[#2EC4B6]">Priority: Calving Ease</p>
+                        <p class="text-sm text-gray-700">Use proven, easy-calving Jersey sires. Use low birth weight EBV beef sires with extreme caution.</p>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flowchart-node w-full">Tier 2: Mature Cows (Replacements)</div>
+                    <div class="flowchart-arrow"></div>
+                    <div class="p-4 bg-gray-50 rounded-lg text-center">
+                        <p class="font-bold text-[#00A6ED]">Priority: Herd Improvement</p>
+                        <p class="text-sm text-gray-700">Select sires based on Breeding Worth (BW) and Fertility, while monitoring Liveweight (Lwt) BV.</p>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flowchart-node w-full">Tier 3: Mature Cows (Dairy-Beef)</div>
+                    <div class="flowchart-arrow"></div>
+                    <div class="p-4 bg-gray-50 rounded-lg text-center">
+                        <p class="font-bold text-[#F5B700]">Priority: Calf Value</p>
+                        <p class="text-sm text-gray-700">Select beef sires with low Birth Weight EBV but high 400/600-Day Weight EBVs for growth.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center mt-12 py-6 border-t border-gray-300">
+            <p class="text-gray-500">Data synthesised from research by DairyNZ, Massey University, and associated studies.</p>
+            <p class="text-xs text-gray-400 mt-2">Infographic generated for illustrative purposes.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const vibrantPalette = {
+            blue: '#00A6ED',
+            purple: '#753BBD',
+            yellow: '#F5B700',
+            red: '#FF6B6B',
+            teal: '#2EC4B6',
+            gray: '#6B7280'
+        };
+
+        function wrapLabels(label) {
+            const maxLen = 16;
+            if (typeof label !== 'string' || label.length <= maxLen) {
+                return label;
+            }
+            const words = label.split(' ');
+            let lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).trim().length > maxLen) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            });
+            lines.push(currentLine.trim());
+            return lines;
+        }
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+        
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+        };
+
+        new Chart(document.getElementById('tooLightChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Reduced Viability', 'Lower Growth Rate', 'Disease Susceptibility'],
+                datasets: [{
+                    label: 'Risks of Low Birth Weight',
+                    data: [40, 35, 25],
+                    backgroundColor: [vibrantPalette.yellow, vibrantPalette.red, vibrantPalette.gray],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: defaultChartOptions
+        });
+
+        new Chart(document.getElementById('tooHeavyChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Dystocia Risk', 'Calf Mortality', 'Dam Health Issues'],
+                datasets: [{
+                    label: 'Risks of High Birth Weight',
+                    data: [50, 30, 20],
+                    backgroundColor: [vibrantPalette.red, vibrantPalette.purple, vibrantPalette.gray],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: defaultChartOptions
+        });
+
+        new Chart(document.getElementById('breedComparisonChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jersey Dam', 'KiwiCross Dam', 'Holstein-Friesian Dam'].map(wrapLabels),
+                datasets: [
+                    {
+                        label: 'Sired by Jersey',
+                        data: [27.6, 29.7, 31.2],
+                        backgroundColor: vibrantPalette.yellow,
+                    },
+                    {
+                        label: 'Sired by KiwiCross',
+                        data: [29.6, 31.7, 33.2],
+                        backgroundColor: vibrantPalette.teal,
+                    },
+                    {
+                        label: 'Sired by Holstein-Friesian',
+                        data: [32.5, 34.5, 36.1],
+                        backgroundColor: vibrantPalette.blue,
+                    }
+                ]
+            },
+            options: { ...defaultChartOptions,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 25,
+                        title: { display: true, text: 'Birth Weight (kg)' }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('dairyBeefHeiferChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Jersey Sire', 'Angus Sire', 'Hereford Sire'],
+                datasets: [
+                    {
+                        label: 'Avg. Birth Weight (kg)',
+                        data: [30.5, 34.5, 36.5],
+                        backgroundColor: vibrantPalette.purple,
+                        yAxisID: 'y-weight',
+                    },
+                    {
+                        label: 'Assistance Rate (%)',
+                        data: [0, 4.2, 9.3],
+                        backgroundColor: vibrantPalette.red,
+                        yAxisID: 'y-rate',
+                    }
+                ]
+            },
+            options: { ...defaultChartOptions,
+                scales: {
+                    'y-weight': {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: false,
+                        min: 28,
+                        title: { display: true, text: 'Birth Weight (kg)' }
+                    },
+                    'y-rate': {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        max: 10,
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: 'Assistance Rate (%)' }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('parityEffectChart'), {
+            type: 'bar',
+            data: {
+                labels: ['First-Calving Heifer', 'Mature Cow (3+ Calvings)'].map(wrapLabels),
+                datasets: [{
+                    label: 'Average Birth Weight (kg)',
+                    data: [32.5, 34.2],
+                    backgroundColor: [vibrantPalette.teal, vibrantPalette.blue],
+                    barPercentage: 0.6
+                }]
+            },
+            options: { ...defaultChartOptions,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 30,
+                        title: { display: true, text: 'Birth Weight (kg)' }
+                    }
+                }
+            }
+        });
+        
+        new Chart(document.getElementById('seasonalDynamicsChart'), {
+            type: 'line',
+            data: {
+                labels: ['Birth', 'Weaning'],
+                datasets: [
+                    {
+                        label: 'Spring-Born Calf Path',
+                        data: [{x: 'Birth', y: 38}, {x: 'Weaning', y: 105}],
+                        borderColor: vibrantPalette.blue,
+                        backgroundColor: vibrantPalette.blue + '33',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Autumn-Born Calf Path',
+                        data: [{x: 'Birth', y: 41}, {x: 'Weaning', y: 98}],
+                        borderColor: vibrantPalette.yellow,
+                        backgroundColor: vibrantPalette.yellow + '33',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: { ...defaultChartOptions,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 35,
+                        title: { display: true, text: 'Liveweight (kg)' }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
